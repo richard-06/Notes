@@ -28,3 +28,8 @@
   --font-sanfran: "SFProDL", serif;
   --font-roundedPlus: "M PLUS Rounded 1c", sans-serif;
 }
+
+[contenteditable]:empty:before {
+  content: attr(placeholder);
+  color: #aaa;
+}
