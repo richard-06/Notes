@@ -1,5 +1,9 @@
 import { TagOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "./supabase";
+import NavLeft from "./components/navLeft";
+import TitleList from "./components/titleList";
+import ContentArea from "./components/contentArea";
 
 function App() {
   return (
@@ -27,149 +31,44 @@ function NavTop() {
   );
 }
 
-function NavLeft() {
-  return (
-    <div className="min-w-[250px] border-r-[0.5px] border-stone-600 pl-5 ">
-      <div className="text-3xl font-bold h-[60px] flex items-center ">
-        Notes
-      </div>
-      <div className="bg-stone-700 text-sm font-bold px-2 py-1 rounded-b-md mr-4 mt-2.5 cursor-pointer">
-        All Notes
-      </div>
-      <div className=" text-sm font-bold px-2 py-1 rounded-b-md mr-4 mt-1 cursor-pointer">
-        Archived Notes
-      </div>
-      <div className="  mr-4 my-3 h-[0.8px] bg-stone-600"></div>
-      <div className="text-sm font-bold text-stone-400">Tags</div>
-      <div className="text-md ml-1 mt-2">
-        {" "}
-        <span className="text-sm ">
-          <TagOutlined />
-        </span>
-        {"     Coding"}
-      </div>
-      <div className="text-md ml-1 mt-2">
-        {" "}
-        <span className="text-sm">
-          <TagOutlined />
-        </span>
-        {"     Cooking"}
-      </div>
-      <div className="text-md ml-1 mt-2">
-        {" "}
-        <span className="text-sm">
-          <TagOutlined />
-        </span>
-        {"     Dev"}
-      </div>
-      <div className="text-md ml-1 mt-2">
-        {" "}
-        <span className="text-sm">
-          <TagOutlined />
-        </span>
-        {"     Personel"}
-      </div>
-    </div>
-  );
-}
-
 function Main() {
-  return (
-    <div className="flex-1/2  flex flex-row ">
-      <div className="flex-2/12 min-w-[250px] max-w-[400px] border-r-[0.5px] border-stone-600">
-        <TitleSelected content={"React Basics"} tag={"dev"} />
-        <Title content={"React Basics"} />
-        <Title content={"Javascript notes from the basics"} />
-      </div>
-      <ContentArea />
-    </div>
-  );
-}
+  const [content, setContent] = useState({});
 
-function ContentArea() {
-  const [content, setContent] = useState("");
-  const editorRef = useRef(null);
-  const editor = editorRef.current;
+  const [items, setItems] = useState([]);
 
-  useEffect(() => {
-    const editor = document.getElementById("editor");
+  async function fetchAllRows() {
+    const { data, error } = await supabase.from("notes").select("*");
 
-    const handleKeyDown = (e) => {
-      // Command/Ctrl + B => Bold
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
-        e.preventDefault();
-        document.execCommand("bold");
-      }
+    if (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    } else {
+      setItems(data);
+    }
 
-      // Command/Ctrl + I => Italic
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "i") {
-        e.preventDefault();
-        document.execCommand("italic");
-      }
+    console.log("Data:", data);
 
-      // Command/Ctrl + U => Underline
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "u") {
-        e.preventDefault();
-        document.execCommand("underline");
-      }
-
-      // Enter automatically goes to new line in contenteditable
-    };
-
-    editor.addEventListener("keydown", handleKeyDown);
-    return () => editor.removeEventListener("keydown", handleKeyDown);
-  }, []);
+    return data;
+  }
 
   useEffect(() => {
-    console.log(content);
+    console.log("content has been changed: ", content);
   }, [content]);
 
-  const handleInput = () => {
-    const html = editorRef.current.innerHTML;
-    setContent(html);
-  };
-
   return (
-    <div className="flex-10/12 min-w-[500px]  ">
-      <div className="flex w-[100%] justify-end ">
-        <div className="w-fit right-5 top-2 text-[10px] mt-4 rounded-sm border-[0.5px]  mr-5 px-2 py-1">
-          Add Tag
-        </div>
-      </div>
-      <div
-        ref={editorRef}
-        contentEditable
-        suppressContentEditableWarning
-        className="min-h-[300px] outline-none text-base leading-relaxed px-4 py-1 "
-        placeholder="Start typing..."
-        onInput={handleInput}
-        id="editor"
-        // dangerouslySetInnerHTML={{ __html: content }}
-      ></div>
-      {/* <div contentEditable className="px-4 text-xl pt-1 pb-1 font-bold">
-        React Basics
-      </div>
-      <div className="px-4 text-sm">
-        {`So I started to walk into the water. I won't lie to you boys, I was
-        terrified. But I pressed on, and as I made my way past the breakers a
-        strange calm came over me. I don't know if it was divine intervention or
-        the kinship of all living things but I tell you Jerry at that moment, I
-        was a marine biologist. for await \n \n I don't know if it was divine`}
-      </div> */}
-    </div>
-  );
-}
-
-function Title({ content, tag }) {
-  return (
-    <div className="pl-2 py-1 border-[0.5px] border-stone-600 m-2 rounded-sm cursor-pointer">
-      <div className="font-bold text-md leading-[1.5rem]"> {content} </div>
-      {tag && (
-        <div className="border-[0.5px] mt-1 border-stone-600 w-fit text-[10px] bg-stone-700 px-2 rounded-sm">
-          {tag}
-        </div>
-      )}
-      <div className="text-[10px] mt-1">18 Oct 2004</div>
+    <div className="flex-1/2  flex flex-row ">
+      <TitleList
+        setContent={setContent}
+        items={items}
+        setItems={setItems}
+        fetchAllRows={fetchAllRows}
+      />
+      <ContentArea
+        fetchAllRows={fetchAllRows}
+        uuid={"94352e90-e44a-4b7a-a712-00b13f93c525"}
+        content={content}
+        setContent={setContent}
+      />
     </div>
   );
 }

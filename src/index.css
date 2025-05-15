@@ -1,6 +1,27 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap"); */
+
+/* Fix fonts later */
+/* @theme {
+  --font-roboto: "Roboto", sans-serif;
+  --font-sanfran: "SFProDL", serif;
+  --font-roundedPlus: "M PLUS Rounded 1c", sans-serif;
+}
+@font-face {
+  font-family: "SFProDL";
+  src: url("/fonts/SF-Pro-Display-Light.otf") format(".otf");
+  font-weight: normal;
+  font-style: normal;
+} */
+
+[contenteditable]::first-line {
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 50px;
+  /* color: red; */
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -14,22 +35,4 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-@font-face {
-  font-family: "SFProDL";
-  src: url("/fonts/SF-Pro-Display-Light.otf") format(".otf");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@theme {
-  --font-roboto: "Roboto", sans-serif;
-  --font-sanfran: "SFProDL", serif;
-  --font-roundedPlus: "M PLUS Rounded 1c", sans-serif;
-}
-
-[contenteditable]:empty:before {
-  content: attr(placeholder);
-  color: #aaa;
 }
