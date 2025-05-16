@@ -1,26 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { supabase } from "../supabase";
 
-export default function ContentArea({
-  uuid,
-  content,
-  setContent,
-  fetchAllRows,
-}) {
-  const editorRef = useRef(null);
-
-  const [text, setText] = useState("");
-  // const editor = editorRef.current;
-
-  useEffect(() => {
-    setText(content.content);
-  }, []);
-
+export default function ContentArea({ content, fetchAllRows, editorRef }) {
   useEffect(() => {
     if (editorRef.current && content?.content) {
       editorRef.current.innerHTML = content.content;
     }
-  }, [content]);
+    if (Object.keys(content).length === 0 || content?.content == "") {
+      editorRef.current.innerHTML = "";
+    }
+  }, [content, editorRef]);
 
   useEffect(() => {
     const editor = document.getElementById("editor");
@@ -51,16 +40,16 @@ export default function ContentArea({
     return () => editor.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  function convertTitle(str) {
-    const index = str.indexOf("<");
-    if (index === -1) {
-      return `</b>{${str}}</b>`;
-    }
+  //   function convertTitle(str) {
+  //     const index = str.indexOf("<");
+  //     if (index === -1) {
+  //       return `</b>{${str}}</b>`;
+  //     }
 
-    const before = str.slice(0, index);
-    const after = str.slice(index);
-    return `</b>{${before}}</b>${after}`;
-  }
+  //     const before = str.slice(0, index);
+  //     const after = str.slice(index);
+  //     return `</b>{${before}}</b>${after}`;
+  //   }
 
   function fetchTitle(str) {
     const index = str.indexOf("<");
@@ -75,7 +64,7 @@ export default function ContentArea({
 
   const handleInput = async () => {
     const html = editorRef.current.innerHTML;
-    setText(html);
+    // setText(html);
 
     const { data, error } = await supabase
       .from("notes")
@@ -114,13 +103,21 @@ export default function ContentArea({
     <div className="flex-10/12 min-w-[500px]  ">
       <div className="flex w-[100%] justify-end ">
         <div
-          onClick={console.log(content.content)}
+          onClick={() => console.log("logging content:", content)}
           className="w-fit right-5 top-2 text-[10px] mt-4 rounded-sm border-[0.5px]  mr-5 px-2 py-1 cursor-pointer"
         >
           Add Tag
         </div>
       </div>
-      <div>Test: {content.title}</div>
+
+      <div
+        onClick={() => {
+          console.log("working");
+          editorRef.current.focus();
+        }}
+      >
+        Test: {content.title}
+      </div>
       <div
         ref={editorRef}
         contentEditable
